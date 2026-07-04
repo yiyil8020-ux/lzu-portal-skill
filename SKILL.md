@@ -131,3 +131,17 @@ cookie 过期标志：401/302 → sso → 提示重导 storage_state。
 | ST ticket | 免密打开服务网页 | GET `/app-user/getSt` | 一次性 |
 
 **gateway_token 使用**：登录后缓存，后续请求 `Authorization: {gateway_token}`，过期时重新登录。不需要每次重新登录。
+
+## 特殊字段说明
+
+### 空教室 skjc 字段
+
+空教室查询返回的 `skjc` 字段是 14 位二进制字符串，对应节次：
+- 位置 0-13 对应：`1, 2, 3, 4, 中, 中2, 5, 6, 7, 8, 9, 10, 11, 12`
+- **`1` = 空闲，`0` = 占用**（注意：不是 0=空闲）
+
+### EasyTong 校园卡密钥
+
+EasyTong 校园卡查询需要 MD5 签名。密钥从 FasterLZU app.js 逆向获得：
+- `MD5KeyYm = ok15we1@oid8x5afd@`
+- 签名方式：`MD5(AccNum|Time|MD5KeyYm)` 或 `MD5(AccNum|EPID|Time|MD5KeyYm)`
