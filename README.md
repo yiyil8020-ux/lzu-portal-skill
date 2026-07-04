@@ -88,3 +88,4 @@ portal-skill/
 - gateway_token 有效期至少 5 分钟
 - EasyTong 密钥：`ok15we1@oid8x5afd@`（从 FasterLZU 逆向）
 - 场馆预约等 WAF 保护的功能需要 CDP
+- 空教室 `skjc` 字段：`1=空闲，0=占用`（14 位，对应 1,2,3,4,中,中2,5,6,7,8,9,10,11,12 节）
