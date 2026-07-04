@@ -37,7 +37,11 @@ pip install requests
 ```bash
 # 第一步：导出登录信息（一次性）
 python3 cli.py auth
+```
 
+> **初始配置**：需要填写你的学号和兰大 App 登录密码。这些信息只会保存在本地（`~/.openclaw-lzu/` 目录），不会上传到任何服务器，不用担心安全问题。
+
+```bash
 # 查东西
 python3 cli.py query "查校园卡余额"
 python3 cli.py query "查成绩" --param xn=2025 --param xqm=1

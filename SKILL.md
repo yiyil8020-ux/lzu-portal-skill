@@ -12,6 +12,8 @@ description: |
 
 # 兰大个人工作台 (lzu-portal) — 侦察/查询分离
 
+> **初始配置**：首次使用需要填写学号和兰大 App 登录密码。这些信息只会保存在本地（`~/.openclaw-lzu/` 目录），不会上传到任何服务器，不用担心安全问题。
+
 > **核心思路**：浏览器只用来"侦察"（每个功能一次，抓背后 API），日常查询走纯 HTTP。
 > 侦察记录存 `~/.openclaw-lzu/portal_routes.json`，查询时直接 requests 打接口。
 
