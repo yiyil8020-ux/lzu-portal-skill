@@ -3,16 +3,15 @@ name: lzu-portal
 version: 0.3.1
 license: MIT
 description: |
-  兰大校园助手 —— 查成绩、查课表、查校园卡、查空教室、查考试安排，一句话搞定。
-  首次用某个功能会自动"侦察"一下接口，之后就直接调接口，不用再开浏览器。
-  适用于任何能跑 shell 的 AI 助手（OpenClaw / OpenCode / Claude Code / Codex / Cursor / Gemini CLI 等）。
+  兰州大学个人工作台（my.lzu.edu.cn）通用操作 skill —— 侦察/查询分离架构。
+  侦察阶段（每功能一次）：CDP + 网络监听，用户手动点一次，自动记录背后的真实 API 接口。
+  查询阶段（日常）：纯 requests + cookie，直接打 API 拿 JSON，不开浏览器。
+  只有"接口摸不到必须页面交互触发"或"cookie 过期要重登"才退回 CDP。
 触发场景: 兰大个人工作台上的任何操作 —— 查校园卡余额/消费、查考试安排、查成绩、查课表、网费/电费充值、查服务时间、查空教室、通讯录、场馆预约、本科质量监测、教务系统操作、...
 触发词: 校园卡, 一卡通, 余额, 考试安排, 成绩, 课表, 网费, 电费, 服务时间, 空教室, 通讯录, 场馆预约, 评教, 本科质量监测, 教务系统, 个人工作台, 门户, my.lzu, portal
 ---
 
 # 兰大个人工作台 (lzu-portal) — 侦察/查询分离
-
-> **初始配置**：首次使用需要填写学号和兰大 App 登录密码。这些信息只会保存在本地（`~/.openclaw-lzu/` 目录），不会上传到任何服务器，不用担心安全问题。
 
 > **核心思路**：浏览器只用来"侦察"（每个功能一次，抓背后 API），日常查询走纯 HTTP。
 > 侦察记录存 `~/.openclaw-lzu/portal_routes.json`，查询时直接 requests 打接口。
@@ -120,7 +119,7 @@ cookie 过期标志：401/302 → sso → 提示重导 storage_state。
 | 查校园卡余额 | `my.lzu.edu.cn/.../etongGetWalletMoney` | **EasyTong ET token** | GET | 无 |
 | 查未读消息 | `my.lzu.edu.cn/api/eusp-terminal-message/message-collect/messageStatus` | gateway_token | POST | 无 |
 | 查最新通知 | `my.lzu.edu.cn/api/eusp-news-notice/news/address/getZjNews` | gateway_token | POST | current/size |
-| 查空教室 | `appservice.lzu.edu.cn/api/lzu-teaching-research/V2/kjscx/getJsxx` | gateway_token | POST | xqh/jxlh/cur_page/rq |
+| 查空教室 | `appservice.lzu.edu.cn/api/lzu-teaching-research/V2/kjscx/getJsxx` | gateway_token | POST | xqh/building/floor/rq/slot |
 
 ## 认证方式
 
