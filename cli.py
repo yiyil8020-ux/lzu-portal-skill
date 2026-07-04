@@ -88,10 +88,13 @@ def cmd_query(args):
             username = cfg.get("lzu_username", "").split("@")[0]
             password = cfg.get("lzu_portal_password", "")
             xqh = user_inputs.get("xqh", "02")
-            jxlh = user_inputs.get("jxlh", "02010017")
+            building = user_inputs.get("building")
+            floor = user_inputs.get("floor")
+            if floor:
+                floor = int(floor)
             date_str = user_inputs.get("date")
             slot = user_inputs.get("slot")
-            result = query_empty_classrooms(username, password, xqh, jxlh, date_str, slot)
+            result = query_empty_classrooms(username, password, xqh, building, floor, date_str, slot)
             if result.get("ok"):
                 print(f"✅ 空教室查询: {result['date']} {result['slot']}")
                 print(f"   总教室: {result['total']}，全空闲: {result['free']}")

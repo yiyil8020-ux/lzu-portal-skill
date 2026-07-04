@@ -19,15 +19,17 @@ TIME_SLOTS = {
 }
 
 
-def query_empty_classrooms(username: str, password: str, xqh: str, jxlh: str,
+def query_empty_classrooms(username: str, password: str, xqh: str = "02",
+                           building: str = None, floor: int = None,
                            date_str: str = None, slot: str = None) -> dict:
     """查询空教室。
 
     Args:
         username: 学号
         password: 密码
-        xqh: 校区号（如 '02' = 榆中）
-        jxlh: 教学楼号（如 '02010017' = 天山堂）
+        xqh: 校区号（默认 '02' = 榆中）
+        building: 教学楼名称（如 '秦岭堂'、'天山堂'），支持模糊匹配
+        floor: 楼层（如 1 = 一楼，2 = 二楼）
         date_str: 查询日期 YYYY-MM-DD（默认今天）
         slot: 时段筛选（'上午'/'下午'/'晚上'/'全天'，默认全天）
 
@@ -49,17 +51,35 @@ def query_empty_classrooms(username: str, password: str, xqh: str, jxlh: str,
             return {"ok": False, "error": f"登录失败: {r1.json().get('message', '')}"}
         gateway_token = r1.json()["data"]["gateway_token"]
 
-        # Step 2: 查询空教室
+        # Step 2: 查询空教室（不指定教学楼，获取全部）
         r2 = requests.post(
             "https://appservice.lzu.edu.cn/api/lzu-teaching-research/V2/kjscx/getJsxx",
             headers={"User-Agent": UA, "Authorization": gateway_token, "Content-Type": "application/json"},
-            json={"xqh": xqh, "jxlh": jxlh, "cur_page": 1, "record_per_page": 200, "rq": date_str},
+            json={"xqh": xqh, "jxlh": "", "cur_page": 1, "record_per_page": 500, "rq": date_str},
             timeout=15,
         )
         if r2.json().get("code") != 1:
             return {"ok": False, "error": f"查询失败: {r2.json().get('message', '')}"}
 
         rooms = r2.json()["data"]["dto_list"]
+
+        # Step 3: 按教学楼名称筛选（支持模糊匹配）
+        if building:
+            rooms = [r for r in rooms if building in r.get("jxlmc", "")]
+
+        # Step 4: 按楼层筛选（从教室名称提取楼层）
+        if floor is not None:
+            filtered = []
+            for r in rooms:
+                jsmc = r.get("jsmc", "")
+                # 教室名称格式：秦岭堂A101、天山堂B201
+                # 提取字母后的第一位数字作为楼层
+                for i, c in enumerate(jsmc):
+                    if c.isdigit() and i > 0 and jsmc[i-1].isalpha():
+                        if int(c) == floor:
+                            filtered.append(r)
+                        break
+            rooms = filtered
 
         # Step 3: 解析 skjc 字段（1=空闲，0=占用）
         if slot and slot in TIME_SLOTS:

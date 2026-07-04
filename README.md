@@ -45,7 +45,11 @@ python3 cli.py auth
 # 查东西
 python3 cli.py query "查校园卡余额"
 python3 cli.py query "查成绩" --param xn=2025 --param xqm=1
-python3 cli.py query "查空教室" --param xqh=02 --param jxlh=02010017 --param slot=下午
+
+# 空教室查询（直接说教学楼名称，不需要代码）
+python3 cli.py query "查空教室" --param building=秦岭堂 --param floor=1 --param slot=下午
+python3 cli.py query "查空教室" --param building=天山堂 --param slot=上午
+python3 cli.py query "查空教室" --param xqh=0101 --param building=贺兰堂
 
 # 看看都有哪些功能
 python3 cli.py routes
