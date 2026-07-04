@@ -28,6 +28,10 @@ python3 cli.py recon "查校园卡余额"
 python3 cli.py query "查校园卡余额"
 python3 cli.py query "查成绩" --param xn=2025 --param xqm=1
 
+# 空教室查询（自动解析 skjc 字段）
+python3 cli.py query "查空教室" --param xqh=02 --param jxlh=02010017 --param slot=下午
+python3 cli.py query "查空教室" --param xqh=02 --param jxlh=02010017 --param date=2026-07-07
+
 # 列出所有路由
 python3 cli.py routes
 
@@ -47,18 +51,18 @@ python3 cli.py status
 
 ## 已验证功能
 
-| 功能 | 认证方式 | 状态 |
+| 功能 | 查询方式 | 状态 |
 |---|---|---|
 | 查用户信息 | gateway_token | ✅ |
 | 查未读消息 | gateway_token | ✅ |
 | 查最新通知 | gateway_token | ✅ |
-| 查空教室 | gateway_token | ✅ |
+| **查空教室** | **gateway_token + skjc 解析** | ✅ |
 | 查成绩 | gateway_token | ✅ |
 | 查课表 | gateway_token | ✅ |
 | 查学期信息 | gateway_token | ✅ |
 | 查本周课表 | gateway_token | ✅ |
-| 查考试安排 | gateway_token | ✅ |
-| 查校园卡余额 | EasyTong ET token | ✅ |
+| 查考试安排 | gateway_token + ST + accessTokenBySt | ✅ |
+| **查校园卡余额** | **EasyTong ET token + MD5 签名** | ✅ |
 | 查服务时间 | 静态数据 | ✅ |
 | 32 个服务打开 | 免密打开 | ✅ |
 
@@ -71,6 +75,7 @@ portal-skill/
 ├── cli.py            # CLI 入口
 ├── query.py          # 查询引擎
 ├── easytong.py       # EasyTong 校园卡查询 helper
+├── classroom.py      # 空教室查询 helper（skjc 解析）
 ├── auth.py           # storage_state 导出
 ├── recon.py          # 侦察脚本
 └── __init__.py

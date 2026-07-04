@@ -52,18 +52,18 @@ def cmd_query(args):
                 k, v = p.split("=", 1)
                 user_inputs[k.strip()] = v.strip()
 
+    # 读取配置（优先当前目录，其次仓库根）
+    cfg_path = Path("config.json")
+    if not cfg_path.exists():
+        parent_cfg = Path(__file__).resolve().parent.parent / "config.json"
+        if parent_cfg.exists():
+            cfg_path = parent_cfg
+
     # 特殊处理：校园卡余额（EasyTong 4 步流程）
     if args.task == "查校园卡余额":
         try:
             from easytong import get_campus_card_balance
-            import json as _json
-            # 优先从当前目录读，其次从仓库根目录读
-            cfg_path = Path("config.json")
-            if not cfg_path.exists():
-                parent_cfg = Path(__file__).resolve().parent.parent / "config.json"
-                if parent_cfg.exists():
-                    cfg_path = parent_cfg
-            cfg = _json.loads(cfg_path.read_text("utf-8"))
+            cfg = json.loads(cfg_path.read_text("utf-8"))
             username = cfg.get("lzu_username", "").split("@")[0]
             password = cfg.get("lzu_portal_password", "")
             result = get_campus_card_balance(username, password)
@@ -72,6 +72,35 @@ def cmd_query(args):
                 print(f"   姓名: {result['name']}")
                 print(f"   卡名: {result['card_name']}")
                 print(f"   本月消费: {result['monthly_spend']} 元")
+            else:
+                print(f"❌ 查询失败: {result.get('error', '未知错误')}")
+                sys.exit(1)
+        except Exception as e:
+            print(f"❌ 查询失败: {e}")
+            sys.exit(1)
+        return
+
+    # 特殊处理：空教室查询（解析 skjc 字段，直接返回格式化结果）
+    if args.task == "查空教室":
+        try:
+            from classroom import query_empty_classrooms
+            cfg = json.loads(cfg_path.read_text("utf-8"))
+            username = cfg.get("lzu_username", "").split("@")[0]
+            password = cfg.get("lzu_portal_password", "")
+            xqh = user_inputs.get("xqh", "02")
+            jxlh = user_inputs.get("jxlh", "02010017")
+            date_str = user_inputs.get("date")
+            slot = user_inputs.get("slot")
+            result = query_empty_classrooms(username, password, xqh, jxlh, date_str, slot)
+            if result.get("ok"):
+                print(f"✅ 空教室查询: {result['date']} {result['slot']}")
+                print(f"   总教室: {result['total']}，全空闲: {result['free']}")
+                if result["free_rooms"]:
+                    print(f"\n   全空闲教室:")
+                    for room in result["free_rooms"][:20]:
+                        print(f"     {room['name']} ({room['seats']}座, {room['floor']}层)")
+                    if len(result["free_rooms"]) > 20:
+                        print(f"     ... 共 {len(result['free_rooms'])} 间")
             else:
                 print(f"❌ 查询失败: {result.get('error', '未知错误')}")
                 sys.exit(1)

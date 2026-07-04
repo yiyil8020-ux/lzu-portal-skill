@@ -110,16 +110,16 @@ cookie 过期标志：401/302 → sso → 提示重导 storage_state。
 
 ## 已验证的 API 端点
 
-| 任务 | 端点 | 认证方式 | 参数 |
-|---|---|---|---|
-| 查考试安排 | `appservice.lzu.edu.cn/api/lzu-teaching-research/ksap/bksksap` | cookie | 无 |
-| 查课表 | `appservice.lzu.edu.cn/api/lzu-teaching-research/kcb/getZdyCourse` | cookie | zc=周次 |
-| 查学期信息 | `appservice.lzu.edu.cn/api/lzu-teaching-research/kcb/getXlxx` | cookie | 无 |
-| 查用户信息 | `my.lzu.edu.cn/api/eusp-unify-terminal/individual-workspace/userInfo` | cookie | 无 |
-| 查校园卡余额 | `my.lzu.edu.cn/api/eusp-unify-terminal/individual-workspace/etongGetWalletMoney` | cookie | 无 |
-| 查未读消息 | `my.lzu.edu.cn/api/eusp-terminal-message/message-collect/messageStatus` | cookie | 无 |
-| 查最新通知 | `my.lzu.edu.cn/api/eusp-news-notice/news/address/getZjNews` | cookie | current/size |
-| 查空教室 | `appservice.lzu.edu.cn/api/lzu-teaching-research/V2/kjscx/getJsxx` | **gateway_token** | xqh/jxlh/cur_page/rq |
+| 任务 | 端点 | 认证方式 | 方法 | 参数 |
+|---|---|---|---|---|
+| 查考试安排 | `appservice.lzu.edu.cn/api/lzu-teaching-research/ksap/bksksap` | gateway_token | GET | 无（返回当前学期） |
+| 查课表 | `appservice.lzu.edu.cn/api/lzu-teaching-research/kcb/getZdyCourse` | gateway_token | GET | zc=周次, qsbz=0 |
+| 查学期信息 | `appservice.lzu.edu.cn/api/lzu-teaching-research/kcb/getXlxx` | gateway_token | POST | 无 |
+| 查用户信息 | `my.lzu.edu.cn/api/eusp-unify-terminal/individual-workspace/userInfo` | gateway_token | GET | 无 |
+| 查校园卡余额 | `my.lzu.edu.cn/.../etongGetWalletMoney` | **EasyTong ET token** | GET | 无 |
+| 查未读消息 | `my.lzu.edu.cn/api/eusp-terminal-message/message-collect/messageStatus` | gateway_token | POST | 无 |
+| 查最新通知 | `my.lzu.edu.cn/api/eusp-news-notice/news/address/getZjNews` | gateway_token | POST | current/size |
+| 查空教室 | `appservice.lzu.edu.cn/api/lzu-teaching-research/V2/kjscx/getJsxx` | gateway_token | POST | xqh/jxlh/cur_page/rq |
 
 ## 认证方式
 
@@ -139,6 +139,12 @@ cookie 过期标志：401/302 → sso → 提示重导 storage_state。
 空教室查询返回的 `skjc` 字段是 14 位二进制字符串，对应节次：
 - 位置 0-13 对应：`1, 2, 3, 4, 中, 中2, 5, 6, 7, 8, 9, 10, 11, 12`
 - **`1` = 空闲，`0` = 占用**（注意：不是 0=空闲）
+
+**教室名称匹配**：用户可能会用简称（如「A501」），实际 API 返回的是全称（如「医学校区A区501」或「天山堂A501」）。匹配时应灵活处理：优先精确匹配，匹配不到就用包含匹配，并结合用户上下文（校区/教学楼）判断是哪间教室。
+
+### 校车发车时间
+
+查询校车时间表时提醒用户：**发车表列出的是固定发车时间，其余时间校车坐满即发**（等待时间约 15 分钟）。如果用户问某个时间点有没有校车，先查发车表，如果表里没有，再告诉用户可以去站点等坐满即发的车。
 
 ### EasyTong 校园卡密钥
 

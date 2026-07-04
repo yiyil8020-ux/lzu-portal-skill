@@ -41,6 +41,10 @@
 
 侦察阶段验证：如果 API 端点也 412，该路由标 `"waf_blocked": true`，查询阶段走 1.5（WAF token 周期刷新，不是每次查询开 CDP）。
 
+### GET 请求不能带 Content-Type: application/json
+
+实测发现，`appservice.lzu.edu.cn` 的 GET 接口如果 header 里带 `Content-Type: application/json`，会返回 `code=0 msg=失败`（不是 401/412，容易误判成认证失败）。**GET 请求只放 `Authorization` + `User-Agent`，不要放 `Content-Type`。** POST 请求才需要 `Content-Type: application/json` 或 `application/x-www-form-urlencoded`。
+
 ### WAF token TTL 机制
 
 WAF 的放行凭证（通常是个 cookie）有有效期。侦察阶段观察：
