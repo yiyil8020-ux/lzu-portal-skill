@@ -275,6 +275,18 @@ Step 3: 拿 ST → 免密打开
 | `schema_mismatch` | 200 但 `response_path` 取不到值 | 接口改版 → 计数≥2 触发走 2 重新侦察 |
 | `timeout` | 请求超时 | 网络抖动 → 重试 1 次，再失败走 2 |
 
+### EasyTong 校园卡密钥
+
+EasyTong 校园卡查询需要 MD5 签名。密钥从 FasterLZU app.js 逆向获得：
+- `MD5KeyYm = ok15we1@oid8x5afd@`
+- 签名方式：`MD5(AccNum|Time|MD5KeyYm)` 或 `MD5(AccNum|EPID|Time|MD5KeyYm)`
+
+### 空教室 skjc 字段
+
+空教室查询返回的 `skjc` 字段是 14 位二进制字符串，对应节次：
+- 位置 0-13 对应：`1, 2, 3, 4, 中, 中2, 5, 6, 7, 8, 9, 10, 11, 12`
+- **`1` = 空闲，`0` = 占用**（注意：不是 0=空闲）
+
 ## 侦察脚本契约（skills/portal/recon.py）
 
 ### 新侦察流程（登录/取数据分离）
